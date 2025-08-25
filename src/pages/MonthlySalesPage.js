@@ -1,5 +1,26 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const MonthlySalesPage = () => {
   const [vendors, setVendors] = useState([]);
@@ -13,10 +34,9 @@ const MonthlySalesPage = () => {
         const response = await axios.get(
           "https://loncabackend.onrender.com/api/vendors"
         );
-        console.error(response.data);
         setVendors(response.data);
         if (response.data.length > 0) {
-          setSelectedVendor(response.data[0].id);
+          setSelectedVendor(response.data[0]._id);
         }
       } catch (err) {
         setError("Failed to fetch vendors.");
@@ -45,6 +65,32 @@ const MonthlySalesPage = () => {
     }
   }, [selectedVendor]);
 
+  const chartData = {
+    labels: salesData.map((item) => item.period),
+    datasets: [
+      {
+        label: "Total Sales",
+        data: salesData.map((item) => item.salesValue),
+        fill: false,
+        borderColor: "rgb(75, 192, 192)",
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Monthly Sales Trend",
+      },
+    },
+  };
+
   return (
     <div className="page-content">
       <h2>Monthly Sales</h2>
@@ -57,29 +103,34 @@ const MonthlySalesPage = () => {
           Select a Vendor
         </option>
         {vendors.map((vendor) => (
-          <option key={vendor.id} value={vendor.id}>
+          <option key={vendor._id} value={vendor._id}>
             {vendor.name}
           </option>
         ))}
       </select>
 
       {salesData.length > 0 ? (
-        <table>
-          <thead>
-            <tr>
-              <th>Month</th>
-              <th>Total Sales</th>
-            </tr>
-          </thead>
-          <tbody>
-            {salesData.map((item, index) => (
-              <tr key={index}>
-                <td>{item.month}</td>
-                <td>{item.totalSales}</td>
+        <div>
+          <div style={{ marginBottom: "2rem", marginTop: "1rem" }}>
+            <Line options={chartOptions} data={chartData} />
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Year - Month</th>
+                <th>Total Sales</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {salesData.map((item) => (
+                <tr key={item.period}>
+                  <td>{item.period}</td>
+                  <td>{item.salesValue}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <p>
           {selectedVendor

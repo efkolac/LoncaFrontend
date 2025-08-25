@@ -15,7 +15,7 @@ const Navigation = () => {
         </li>
         <li>
           <NavLink
-            to="/monthly"
+            to="/monthly-sales"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
             Monthly Sales
