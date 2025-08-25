@@ -11,7 +11,9 @@ const AllTimeUnitsPage = () => {
     const fetchVendors = async () => {
       try {
         console.error("response");
-        const response = await axios.get("http://localhost:5000/api/vendors");
+        const response = await axios.get(
+          "https://loncabackend.onrender.com/api/vendors"
+        );
         console.error(response);
         setVendors(response.data);
         if (response.data.length > 0) {
@@ -33,7 +35,7 @@ const AllTimeUnitsPage = () => {
           setError("");
           setSalesData([]);
           const response = await axios.get(
-            `http://localhost:5000/api/sales/vendors/${selectedVendor}/all-time-units`
+            `https://loncabackend.onrender.com/api/sales/vendors/${selectedVendor}/all-time-units`
           );
           setSalesData(response.data);
         } catch (err) {
